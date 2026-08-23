@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
+
+# Local environment variables
+.env
+.env.*
+!.env.example
+
+# Cargo build output
+/target/
+
+# rustfmt backup files
+**/*.rs.bk
+
+# Windows debugging files
+*.pdb
+
+# Rust compiler crash reports
+rustc-ice-*.txt
+
+# cargo-mutants output
+**/mutants.out*/
