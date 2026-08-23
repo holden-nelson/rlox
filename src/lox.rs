@@ -1,6 +1,8 @@
 use std::{fs, io::{self, BufRead, Write}};
 use thiserror::Error;
 
+use crate::scanner::Scanner;
+
 pub struct Lox { }
 
 impl Lox {
@@ -37,7 +39,12 @@ impl Lox {
     }
 
     fn run(source: &str) -> Result<(), LoxError> {
-        println!("{source}");
+        let tokens = Scanner::new(source).scan()?;
+
+        for token in &tokens {
+            println!("{token}");
+        }
+
         Ok(())
     }
 

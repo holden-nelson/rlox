@@ -1,5 +1,6 @@
 mod lox;
 mod tokens;
+mod scanner;
 
 use std::{env, process::ExitCode};
 
