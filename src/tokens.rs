@@ -1,15 +1,21 @@
 use std::fmt;
 
+#[derive(Debug, PartialEq)]
 pub struct Token {
     pub token_type: TokenType,
     pub lexeme: String,
     pub literal: Option<TokenLiteral>,
-    pub line: usize
+    pub line: usize,
 }
 
 impl Token {
     pub fn new(token_type: TokenType, lexeme: &str, line: usize) -> Self {
-        Self { token_type, lexeme: lexeme.to_owned(), literal: None, line }
+        Self {
+            token_type,
+            lexeme: lexeme.to_owned(),
+            literal: None,
+            line,
+        }
     }
 
     pub fn with_literal(mut self, literal: TokenLiteral) -> Self {
@@ -31,7 +37,7 @@ impl fmt::Display for Token {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum TokenType {
     // Single-character tokens.
     LeftParen,
@@ -82,11 +88,11 @@ pub enum TokenType {
     Eof,
 }
 
+#[derive(Debug, PartialEq)]
 pub enum TokenLiteral {
     String(String),
-    Number(f64)
+    Number(f64),
 }
-
 
 impl fmt::Display for TokenLiteral {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
