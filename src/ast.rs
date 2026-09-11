@@ -3,13 +3,13 @@ pub enum Expression {
     Literal(Literal),
     Unary {
         operator: UnaryOperator,
-        rhs: Box<Expression>
+        rhs: Box<Expression>,
     },
-    Binary { 
-        lhs: Box<Expression>, 
-        operator: BinaryOperator, 
-        rhs: Box<Expression>  
-    }
+    Binary {
+        lhs: Box<Expression>,
+        operator: BinaryOperator,
+        rhs: Box<Expression>,
+    },
 }
 
 #[derive(Debug)]
@@ -18,13 +18,13 @@ pub enum Literal {
     String(String),
     True,
     False,
-    Nil
+    Nil,
 }
 
 #[derive(Debug)]
 pub enum UnaryOperator {
     Negate,
-    Not
+    Not,
 }
 
 #[derive(Debug)]
@@ -38,7 +38,7 @@ pub enum BinaryOperator {
     Plus,
     Minus,
     Times,
-    Divide
+    Divide,
 }
 
 trait ExpressionVisitor {
@@ -46,43 +46,35 @@ trait ExpressionVisitor {
 
     fn visit_literal(&mut self, value: &Literal) -> Self::Output;
 
-    fn visit_unary(
-        &mut self,
-        operator: &UnaryOperator,
-        rhs: &Expression
-    ) -> Self::Output;
+    fn visit_unary(&mut self, operator: &UnaryOperator, rhs: &Expression) -> Self::Output;
 
     fn visit_binary(
         &mut self,
         lhs: &Expression,
         operator: &BinaryOperator,
-        rhs: &Expression
+        rhs: &Expression,
     ) -> Self::Output;
 }
 
 impl Expression {
-    fn accept<V: ExpressionVisitor>(
-        &self, 
-        visitor: &mut V
-    ) -> V::Output {
+    fn accept<V: ExpressionVisitor>(&self, visitor: &mut V) -> V::Output {
         match self {
             Expression::Literal(value) => visitor.visit_literal(value),
 
-            Expression::Unary { operator, rhs} => {
-                visitor.visit_unary(operator, rhs)
-            }
+            Expression::Unary { operator, rhs } => visitor.visit_unary(operator, rhs),
 
-            Expression::Binary { 
-                lhs, 
-                operator, 
-                rhs 
-            } => visitor.visit_binary(lhs, operator, rhs),
-            
+            Expression::Binary { lhs, operator, rhs } => visitor.visit_binary(lhs, operator, rhs),
         }
     }
 }
 
-struct AstPrinter;
+pub struct AstPrinter;
+
+impl AstPrinter {
+    pub fn print(&mut self, expression: &Expression) -> String {
+        expression.accept(self)
+    }
+}
 
 impl ExpressionVisitor for AstPrinter {
     type Output = String;
@@ -93,15 +85,11 @@ impl ExpressionVisitor for AstPrinter {
             Literal::String(s) => s.clone(),
             Literal::True => "true".to_owned(),
             Literal::False => "false".to_owned(),
-            Literal::Nil => "nil".to_owned()
+            Literal::Nil => "nil".to_owned(),
         }
     }
 
-    fn visit_unary(
-        &mut self,
-        operator: &UnaryOperator,
-        rhs: &Expression
-    ) -> String {
+    fn visit_unary(&mut self, operator: &UnaryOperator, rhs: &Expression) -> String {
         format!("({operator:?} {})", rhs.accept(self))
     }
 
@@ -109,12 +97,8 @@ impl ExpressionVisitor for AstPrinter {
         &mut self,
         lhs: &Expression,
         operator: &BinaryOperator,
-        rhs: &Expression
+        rhs: &Expression,
     ) -> String {
-        format!(
-            "({operator:?} {} {})",
-            lhs.accept(self),
-            rhs.accept(self)
-        )
+        format!("({operator:?} {} {})", lhs.accept(self), rhs.accept(self))
     }
 }
