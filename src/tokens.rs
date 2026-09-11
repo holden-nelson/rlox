@@ -1,5 +1,10 @@
 use std::fmt;
 
+use crate::{
+    ast::{BinaryOperator, UnaryOperator},
+    lox::CompileError,
+};
+
 #[derive(Debug, PartialEq)]
 pub struct Token {
     pub token_type: TokenType,
@@ -99,6 +104,46 @@ impl fmt::Display for TokenLiteral {
         match self {
             Self::String(value) => write!(f, "{value}"),
             Self::Number(value) => write!(f, "{value}"),
+        }
+    }
+}
+
+impl TryFrom<&Token> for BinaryOperator {
+    type Error = CompileError;
+
+    fn try_from(token: &Token) -> Result<Self, Self::Error> {
+        match &token.token_type {
+            TokenType::EqualEqual => Ok(Self::Equals),
+            TokenType::BangEqual => Ok(Self::NotEquals),
+            TokenType::Less => Ok(Self::LessThan),
+            TokenType::LessEqual => Ok(Self::LessThanEqual),
+            TokenType::Greater => Ok(Self::GreaterThan),
+            TokenType::GreaterEqual => Ok(Self::GreaterThanEqual),
+            TokenType::Plus => Ok(Self::Plus),
+            TokenType::Minus => Ok(Self::Minus),
+            TokenType::Star => Ok(Self::Times),
+            TokenType::Slash => Ok(Self::Divide),
+            _ => Err(CompileError {
+                line: token.line,
+                at: token.lexeme.clone(),
+                message: "Expected a binary operator.".to_owned(),
+            }),
+        }
+    }
+}
+
+impl TryFrom<&Token> for UnaryOperator {
+    type Error = CompileError;
+
+    fn try_from(token: &Token) -> Result<Self, Self::Error> {
+        match &token.token_type {
+            TokenType::Minus => Ok(Self::Negate),
+            TokenType::Bang => Ok(Self::Not),
+            _ => Err(CompileError {
+                line: token.line,
+                at: token.lexeme.clone(),
+                message: "Expected a unary operator.".to_owned(),
+            }),
         }
     }
 }

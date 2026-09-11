@@ -2,6 +2,7 @@ mod lox;
 mod tokens;
 mod scanner;
 mod ast;
+mod parser;
 
 use std::{env, process::ExitCode};
 

@@ -1,6 +1,7 @@
 #[derive(Debug)]
 pub enum Expression {
     Literal(Literal),
+    Grouping(Box<Expression>),
     Unary {
         operator: UnaryOperator,
         rhs: Box<Expression>,
@@ -46,6 +47,8 @@ trait ExpressionVisitor {
 
     fn visit_literal(&mut self, value: &Literal) -> Self::Output;
 
+    fn visit_grouping(&mut self, expression: &Expression) -> Self::Output;
+
     fn visit_unary(&mut self, operator: &UnaryOperator, rhs: &Expression) -> Self::Output;
 
     fn visit_binary(
@@ -60,6 +63,8 @@ impl Expression {
     fn accept<V: ExpressionVisitor>(&self, visitor: &mut V) -> V::Output {
         match self {
             Expression::Literal(value) => visitor.visit_literal(value),
+
+            Expression::Grouping(expression) => visitor.visit_grouping(expression),
 
             Expression::Unary { operator, rhs } => visitor.visit_unary(operator, rhs),
 
@@ -87,6 +92,10 @@ impl ExpressionVisitor for AstPrinter {
             Literal::False => "false".to_owned(),
             Literal::Nil => "nil".to_owned(),
         }
+    }
+
+    fn visit_grouping(&mut self, expression: &Expression) -> String {
+        format!("(group {})", expression.accept(self))
     }
 
     fn visit_unary(&mut self, operator: &UnaryOperator, rhs: &Expression) -> String {
